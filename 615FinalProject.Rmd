@@ -16,10 +16,10 @@ options(dplyr.summarise.inform = FALSE)
 ```
 
 ```{r}
-#read files
-#Bus, commuter rail and rapid transit reliability
+#Read files
 Reliability <- read.csv("~/Desktop/MBTA_Bus_Commuter_Rail_Rapid_Transit_Reliability.csv")
 
+#Split date column and specified data from November 2021 to October 2022
 Re <- Reliability %>%  separate(service_date, c("service_date", "service_time"), sep = ' ') 
 ReNov <- Re %>% filter(service_date == "2021/11/22"| service_date == "2021/11/23"|service_date == "2021/11/24"| service_date == "2021/11/25"| service_date == "2021/11/26"| service_date == "2021/11/27"| service_date == "2021/11/28")
 ReDec <- Re %>% filter(service_date == "2021/12/20"| service_date == "2021/12/21"|service_date == "2021/12/22"| service_date == "2021/12/23"| service_date == "2021/12/24"| service_date == "2021/12/25"| service_date == "2021/12/26")
@@ -36,6 +36,7 @@ ReOct <- Re %>% filter(service_date == "2022/10/24"| service_date == "2022/10/25
 ```
 
 ```{r}
+#Create a new column named month
 ReNov$month <- "21Nov"
 ReDec$month <- "21Dec"
 ReJan$month <- "22Jan"
@@ -51,6 +52,7 @@ ReOct$month <- "22Oct"
 ```
 
 ```{r}
+#Bind data
 Reoutput <- rbind(ReNov,ReDec,ReJan,ReFeb,ReMar,ReApr,ReMay,ReJun,ReJul,ReAug,ReSep,ReOct)
 ```
 
@@ -80,6 +82,7 @@ ggplot(ReSum, aes(x = month, y = reliability, fill = mode_type)) +
   labs(title = "Reliability by mode type") + 
   facet_wrap(~ mode_type)
 ```
+
 ```{r}
 ggplot(ReSum, aes(x = month, y = cancelled_numerator, fill = mode_type)) +
          geom_bar(position = position_dodge(0.75),width=0.6,stat = "identity")+ 
@@ -89,6 +92,7 @@ ggplot(ReSum, aes(x = month, y = cancelled_numerator, fill = mode_type)) +
   theme(axis.text.x = element_text(angle=90,size=8))+
   labs(title = "Cancellation rate by mode type") 
 ```
+
 ```{r}
 Re_rail <- Re %>% filter(mode_type=="Rail")
 ReSum_rail <- Re_rail %>% group_by(route_category,month) %>% dplyr::summarise(across(c(otp_numerator,otp_denominator,cancelled_numerator), sum))  %>%
@@ -137,6 +141,7 @@ ggplot(ReSum_commuter, aes(x = month, y = reliability, group = route_long_name))
   subtitle = "(Cummter Rail)") +
   facet_wrap(~ route_long_name)
 ```
+
 ```{r}
 ggplot(ReSum_commuter, aes(x = month, y = cancelled_numerator, group = route_long_name))+
   geom_line(aes(color=route_long_name),linetype=1,size=0.5)+ 
@@ -147,7 +152,6 @@ ggplot(ReSum_commuter, aes(x = month, y = cancelled_numerator, group = route_lon
   subtitle = "(Commuter Rail)") +
   facet_wrap(~ route_long_name)
 ```
-
 
 ```{r}
 Re_bus <- Re %>% filter(mode_type=="Bus")
