@@ -1,0 +1,176 @@
+---
+title: "615eda"
+author: "Lintong Li"
+date: "2022-12-15"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+library(tidyverse)
+options(dplyr.summarise.inform = FALSE)
+```
+
+```{r}
+#read files
+#Bus, commuter rail and rapid transit reliability
+Reliability <- read.csv("~/Desktop/MBTA_Bus_Commuter_Rail_Rapid_Transit_Reliability.csv")
+
+Re <- Reliability %>%  separate(service_date, c("service_date", "service_time"), sep = ' ') 
+ReNov <- Re %>% filter(service_date == "2021/11/22"| service_date == "2021/11/23"|service_date == "2021/11/24"| service_date == "2021/11/25"| service_date == "2021/11/26"| service_date == "2021/11/27"| service_date == "2021/11/28")
+ReDec <- Re %>% filter(service_date == "2021/12/20"| service_date == "2021/12/21"|service_date == "2021/12/22"| service_date == "2021/12/23"| service_date == "2021/12/24"| service_date == "2021/12/25"| service_date == "2021/12/26")
+ReJan <- Re %>% filter(service_date == "2021/01/24"| service_date == "2021/01/25"|service_date == "2021/01/26"| service_date == "2021/01/27"| service_date == "2021/01/28"| service_date == "2021/01/29"| service_date == "2021/01/30")
+ReFeb <- Re %>% filter(service_date == "2022/02/21"| service_date == "2022/02/22"|service_date == "2022/02/23"| service_date == "2022/02/24"| service_date == "2022/02/25"| service_date == "2022/02/26"| service_date == "2022/02/27")
+ReMar <- Re %>% filter(service_date == "2022/03/21"| service_date == "2022/03/22"|service_date == "2022/03/23"| service_date == "2022/03/24"| service_date == "2022/03/25"| service_date == "2022/03/26"| service_date == "2022/03/27")
+ReApr <- Re %>% filter(service_date == "2022/04/18"| service_date == "2022/04/19"|service_date == "2022/04/20"| service_date == "2022/04/21"| service_date == "2022/04/22"| service_date == "2022/04/23"| service_date == "2022/04/24")
+ReMay <- Re %>% filter(service_date == "2022/05/23"| service_date == "2022/05/24"|service_date == "2022/05/25"| service_date == "2022/05/26"| service_date == "2022/05/27"| service_date == "2022/05/28"| service_date == "2022/05/29")
+ReJun <- Re %>% filter(service_date == "2022/06/20"| service_date == "2022/06/21"|service_date == "2022/06/22"| service_date == "2022/06/23"| service_date == "2022/06/24"| service_date == "2022/06/25"| service_date == "2022/06/26")
+ReJul <- Re %>% filter(service_date == "2022/07/25"| service_date == "2022/07/26"|service_date == "2022/07/27"| service_date == "2022/07/28"| service_date == "2022/07/29"| service_date == "2022/07/30"| service_date == "2022/07/31")
+ReAug <- Re %>% filter(service_date == "2022/08/22"| service_date == "2022/08/23"|service_date == "2022/08/24"| service_date == "2022/08/25"| service_date == "2022/08/26"| service_date == "2022/08/27"| service_date == "2022/08/28")
+ReSep <- Re %>% filter(service_date == "2022/09/19"| service_date == "2022/09/20"|service_date == "2022/09/21"| service_date == "2022/09/22"| service_date == "2022/09/23"| service_date == "2022/09/24"| service_date == "2022/09/25")
+ReOct <- Re %>% filter(service_date == "2022/10/24"| service_date == "2022/10/25"|service_date == "2022/10/26"| service_date == "2022/10/27"| service_date == "2022/10/28"| service_date == "2022/10/29"| service_date == "2022/10/30")
+```
+
+```{r}
+ReNov$month <- "21Nov"
+ReDec$month <- "21Dec"
+ReJan$month <- "22Jan"
+ReFeb$month <- "22Feb"
+ReMar$month <- "22Mar"
+ReApr$month <- "22Apr"
+ReMay$month <- "22May"
+ReJun$month <- "22Jun"
+ReJul$month <- "22Jul"
+ReAug$month <- "22Aug"
+ReSep$month <- "22Sep"
+ReOct$month <- "22Oct"
+```
+
+```{r}
+Reoutput <- rbind(ReNov,ReDec,ReJan,ReFeb,ReMar,ReApr,ReMay,ReJun,ReJul,ReAug,ReSep,ReOct)
+```
+
+```{r}
+routes <- read.csv("~/Desktop/routes.txt",header = TRUE)
+ReJoin <- left_join(Reoutput, routes, 
+              by = c("gtfs_route_id" = "route_id"))
+Re <-  select(ReJoin, c(1,3,6,7,8,11,12,13,20,22,23))
+```
+
+```{r}
+order = c("21Nov", "21Dec","22Jan","22Feb","22Mar","22Apr","22May","22Jun","22Jul","22Aug","22Sep","22Oct") 
+ReSum <- Re %>% group_by(mode_type,month) %>% 
+  summarise(across(c(otp_numerator,otp_denominator,cancelled_numerator), sum))  %>%
+  mutate(reliability = otp_numerator/otp_denominator) %>%
+  mutate(month = factor(month, levels = order)) 
+```
+
+```{r}
+ggplot(ReSum, aes(x = month, y = reliability, fill = mode_type)) +
+         geom_bar(position = position_dodge(0.75),width=0.6,stat = "identity")+
+  coord_cartesian(ylim=c(0,1)) +
+  scale_y_continuous(expand = c(0,0)) +
+  scale_fill_brewer(palette = "Dark2")+
+  theme(axis.text.x = element_text(angle=90,size=8))+
+  guides(fill = "none") +
+  labs(title = "Reliability by mode type") + 
+  facet_wrap(~ mode_type)
+```
+```{r}
+ggplot(ReSum, aes(x = month, y = cancelled_numerator, fill = mode_type)) +
+         geom_bar(position = position_dodge(0.75),width=0.6,stat = "identity")+ 
+  coord_cartesian(ylim=c(0,11)) +
+  scale_y_continuous(expand = c(0,0)) +
+  scale_fill_brewer(palette = "Dark2")+
+  theme(axis.text.x = element_text(angle=90,size=8))+
+  labs(title = "Cancellation rate by mode type") 
+```
+```{r}
+Re_rail <- Re %>% filter(mode_type=="Rail")
+ReSum_rail <- Re_rail %>% group_by(route_category,month) %>% dplyr::summarise(across(c(otp_numerator,otp_denominator,cancelled_numerator), sum))  %>%
+  mutate(reliability = otp_numerator/otp_denominator) %>%
+  mutate(month = factor(month, levels = order)) 
+ggplot(ReSum_rail, aes(x = month, y = reliability, fill = route_category)) +
+         geom_bar(width=0.7,stat = "identity")+
+  coord_cartesian(ylim=c(0,1)) +
+  scale_y_continuous(expand = c(0,0)) +
+  scale_fill_manual(values=c("#4E84C4", "#52854C", "#E69F00","#CC6666"))+
+  theme(axis.text.x = element_text(angle=90,size=8))+
+  guides(fill = "none") +
+  labs(title = "Reliability by route category",
+  subtitle = "(Rail/Rapid Transit)") +
+  facet_wrap(~ route_category)
+```
+
+```{r}
+Re_railG <- Re %>% filter(route_category=="Green Line")
+ReSum_railG <- Re_railG %>% group_by(gtfs_route_id,month) %>% dplyr::summarise(across(c(otp_numerator,otp_denominator,cancelled_numerator), sum))  %>%
+  mutate(reliability = otp_numerator/otp_denominator) %>%
+  mutate(month = factor(month, levels = order)) 
+ggplot(ReSum_railG, aes(x = month, y = reliability, fill = gtfs_route_id)) +
+         geom_bar(width=0.8,stat = "identity")+
+  coord_cartesian(ylim=c(0,1)) +
+  scale_y_continuous(expand = c(0,0)) +
+  scale_fill_brewer(palette="Set2") +
+  theme(axis.text.x = element_text(angle=90,size=8))+
+  guides(fill = "none") +
+  labs(title = "Reliability by route id",
+  subtitle = "(Green Line)") +
+  facet_wrap(~gtfs_route_id)
+```
+
+```{r}
+Re_commuter <- Re %>% filter(mode_type=="Commuter Rail")
+ReSum_commuter <- Re_commuter %>% group_by(route_long_name,month) %>% dplyr::summarise(across(c(otp_numerator,otp_denominator,cancelled_numerator), sum))  %>%
+  mutate(reliability = otp_numerator/otp_denominator) %>%
+  mutate(month = factor(month, levels = order)) 
+ggplot(ReSum_commuter, aes(x = month, y = reliability, group = route_long_name))+
+  geom_line(aes(color=route_long_name),linetype=1,size=0.5)+ 
+  geom_point(aes(color=route_long_name),shape=8,size=2)+
+  theme(axis.text.x = element_text(angle=90,size=6),strip.text.x = element_text(size = 7))+
+  guides(color = "none") + 
+  labs(title = "Reliability by route name",
+  subtitle = "(Cummter Rail)") +
+  facet_wrap(~ route_long_name)
+```
+```{r}
+ggplot(ReSum_commuter, aes(x = month, y = cancelled_numerator, group = route_long_name))+
+  geom_line(aes(color=route_long_name),linetype=1,size=0.5)+ 
+  geom_point(aes(color=route_long_name),shape=10,size=2)+
+  theme(axis.text.x = element_text(angle=90,size=6),strip.text.x = element_text(size = 7))+
+  guides(color = "none") + 
+  labs(title = "Cancellation rate by route name",
+  subtitle = "(Commuter Rail)") +
+  facet_wrap(~ route_long_name)
+```
+
+
+```{r}
+Re_bus <- Re %>% filter(mode_type=="Bus")
+ReSum_bus <- Re_bus %>% group_by(gtfs_route_desc,month) %>% dplyr::summarise(across(c(otp_numerator,otp_denominator,cancelled_numerator), sum))  %>%
+  mutate(reliability = otp_numerator/otp_denominator) %>%
+  mutate(month = factor(month, levels = order)) 
+ggplot(ReSum_bus, aes(x = month, y = reliability, fill = gtfs_route_desc)) +
+         geom_bar(position = position_dodge(0.75),width=0.8,stat = "identity")+
+  coord_cartesian(ylim=c(0,1)) +
+  scale_y_continuous(expand = c(0,0)) +
+  scale_fill_brewer(palette="Set2")+
+  theme(axis.text.x = element_text(angle=90,size=8))+
+  guides(fill = "none") +
+  facet_wrap(~ gtfs_route_desc)
+ggplot(ReSum_bus, aes(x = month, y = cancelled_numerator, fill = gtfs_route_desc)) +
+         geom_bar(position = position_dodge(0.75), width=3, stat = "identity")+ 
+  coord_cartesian(ylim=c(0,2.5)) +
+  scale_y_continuous(expand = c(0,0)) +
+  scale_fill_brewer(palette = "Dark2")+
+  labs(title = "Reliability by route description",
+  subtitle = "(Bus)") +
+  theme(axis.text.x = element_text(angle=90,size=8))
+```
+
+
+
