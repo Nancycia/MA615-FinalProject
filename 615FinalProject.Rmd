@@ -1,5 +1,5 @@
 ---
-title: "615FinalProject"
+title: "Report of 615FinalProject"
 author: "Lintong Li"
 date: "2022-12-15"
 output: pdf_document
@@ -15,28 +15,47 @@ library(tidyverse)
 options(dplyr.summarise.inform = FALSE)
 ```
 
-```{r}
-#Read files
-Reliability <- read.csv("~/Desktop/MBTA_Bus_Commuter_Rail_Rapid_Transit_Reliability.csv")
+## Clean data
 
-#Split date column and specified data from November 2021 to October 2022
-Re <- Reliability %>%  separate(service_date, c("service_date", "service_time"), sep = ' ') 
-ReNov <- Re %>% filter(service_date == "2021/11/22"| service_date == "2021/11/23"|service_date == "2021/11/24"| service_date == "2021/11/25"| service_date == "2021/11/26"| service_date == "2021/11/27"| service_date == "2021/11/28")
-ReDec <- Re %>% filter(service_date == "2021/12/20"| service_date == "2021/12/21"|service_date == "2021/12/22"| service_date == "2021/12/23"| service_date == "2021/12/24"| service_date == "2021/12/25"| service_date == "2021/12/26")
-ReJan <- Re %>% filter(service_date == "2021/01/24"| service_date == "2021/01/25"|service_date == "2021/01/26"| service_date == "2021/01/27"| service_date == "2021/01/28"| service_date == "2021/01/29"| service_date == "2021/01/30")
-ReFeb <- Re %>% filter(service_date == "2022/02/21"| service_date == "2022/02/22"|service_date == "2022/02/23"| service_date == "2022/02/24"| service_date == "2022/02/25"| service_date == "2022/02/26"| service_date == "2022/02/27")
-ReMar <- Re %>% filter(service_date == "2022/03/21"| service_date == "2022/03/22"|service_date == "2022/03/23"| service_date == "2022/03/24"| service_date == "2022/03/25"| service_date == "2022/03/26"| service_date == "2022/03/27")
-ReApr <- Re %>% filter(service_date == "2022/04/18"| service_date == "2022/04/19"|service_date == "2022/04/20"| service_date == "2022/04/21"| service_date == "2022/04/22"| service_date == "2022/04/23"| service_date == "2022/04/24")
-ReMay <- Re %>% filter(service_date == "2022/05/23"| service_date == "2022/05/24"|service_date == "2022/05/25"| service_date == "2022/05/26"| service_date == "2022/05/27"| service_date == "2022/05/28"| service_date == "2022/05/29")
-ReJun <- Re %>% filter(service_date == "2022/06/20"| service_date == "2022/06/21"|service_date == "2022/06/22"| service_date == "2022/06/23"| service_date == "2022/06/24"| service_date == "2022/06/25"| service_date == "2022/06/26")
-ReJul <- Re %>% filter(service_date == "2022/07/25"| service_date == "2022/07/26"|service_date == "2022/07/27"| service_date == "2022/07/28"| service_date == "2022/07/29"| service_date == "2022/07/30"| service_date == "2022/07/31")
-ReAug <- Re %>% filter(service_date == "2022/08/22"| service_date == "2022/08/23"|service_date == "2022/08/24"| service_date == "2022/08/25"| service_date == "2022/08/26"| service_date == "2022/08/27"| service_date == "2022/08/28")
-ReSep <- Re %>% filter(service_date == "2022/09/19"| service_date == "2022/09/20"|service_date == "2022/09/21"| service_date == "2022/09/22"| service_date == "2022/09/23"| service_date == "2022/09/24"| service_date == "2022/09/25")
-ReOct <- Re %>% filter(service_date == "2022/10/24"| service_date == "2022/10/25"|service_date == "2022/10/26"| service_date == "2022/10/27"| service_date == "2022/10/28"| service_date == "2022/10/29"| service_date == "2022/10/30")
+```{r}
+#read files
+Reliability <- read.csv("~/Desktop/MBTA_Bus_Commuter_Rail_Rapid_Transit_Reliability.csv")
+#Split service date column
+Re <- Reliability %>%  separate(service_date, c("service_date", "service_time"), 
+                                sep = ' ')
+Re$service_date <- as.Date(Re$service_date)
+#Fliter each week in every month from November 2021 to October 2022
+ReNov <- Re %>% filter(service_date == "2021-11-22"| 
+                         service_date == "2021-11-23"| service_date == "2021-11-24"|
+                         service_date == "2021-11-25"| service_date == "2021-11-26"|                           service_date == "2021-11-27"| service_date == "2021-11-28")
+ReDec <- Re %>% filter(service_date == "2021-12-20"| service_date == "2021-12-21"|                             service_date == "2021-12-22"| service_date == "2021-12-23"| 
+                         service_date == "2021-12-24"| service_date == "2021-12-25"|                           service_date == "2021-12-26")
+ReJan <- Re %>% filter(service_date == "2022-01-24"| service_date == "2022-01-25"|                             service_date == "2022-01-26"| service_date == "2022-01-27"|
+                         service_date == "2022-01-28"| service_date == "2022-01-29"|                           service_date == "2022-01-30")
+ReFeb <- Re %>% filter(service_date == "2022-02-21"| service_date == "2022-02-22"|                             service_date == "2022-02-23"| service_date == "2022-02-24"|
+                         service_date == "2022-02-25"|service_date == "2022-02-26"|                            service_date == "2022-02-27")
+ReMar <- Re %>% filter(service_date == "2022-03-21"|service_date == "2022-03-22"|                              service_date == "2022-03-23"| service_date == "2022-03-24"| 
+                         service_date == "2022-03-25"| service_date == "2022-03-26"|                           service_date == "2022-03-27")
+ReApr <- Re %>% filter(service_date == "2022-04-18"| service_date == "2022-04-19"|                             service_date == "2022-04-20"| service_date == "2022-04-21"|
+                         service_date == "2022-04-22"| service_date == "2022-04-23"|                           service_date == "2022-04-24")
+ReMay <- Re %>% filter(service_date == "2022-05-23"| service_date == "2022-05-24"|                             service_date == "2022-05-25"| service_date == "2022-05-26"| 
+                         service_date == "2022-05-27"| service_date == "2022-05-28"|                           service_date == "2022-05-29")
+ReJun <- Re %>% filter(service_date == "2022-06-20"| service_date == "2022-06-21"|                             service_date == "2022-06-22"| service_date == "2022-06-23"|
+                         service_date == "2022-06-24"| service_date == "2022-06-25"|                           service_date == "2022-06-26")
+ReJul <- Re %>% filter(service_date == "2022-07-25"| service_date == "2022-07-26"|                             service_date == "2022-07-27"| service_date == "2022-07-28"| 
+                         service_date == "2022-07-29"| service_date == "2022-07-30"|                           service_date == "2022-07-31")
+ReAug <- Re %>% filter(service_date == "2022-08-22"| service_date == "2022-08-23"|                             service_date == "2022-08-24"| service_date == "2022-08-25"| 
+                         service_date == "2022-08-26"| service_date == "2022-08-27"|                           service_date == "2022-08-28")
+ReSep <- Re %>% filter(service_date == "2022-09-19"| service_date == "2022-09-20"|                             service_date == "2022-09-21"| service_date == "2022-09-22"|
+                         service_date == "2022-09-23"|service_date == "2022-09-24"|                            service_date == "2022-09-25")
+ReOct <- Re %>% filter(service_date == "2022-10-24"|service_date == "2022-10-25"|
+                         service_date == "2022-10-26"| service_date == "2022-10-27"| 
+                         service_date == "2022-10-28"| service_date == "2022-10-29"|                           service_date == "2022-10-30")
+
 ```
 
 ```{r}
-#Create a new column named month
+#Create a new column called month
 ReNov$month <- "21Nov"
 ReDec$month <- "21Dec"
 ReJan$month <- "22Jan"
@@ -52,26 +71,38 @@ ReOct$month <- "22Oct"
 ```
 
 ```{r}
-#Bind data
-Reoutput <- rbind(ReNov,ReDec,ReJan,ReFeb,ReMar,ReApr,ReMay,ReJun,ReJul,ReAug,ReSep,ReOct)
+#Bind multiple dataframe
+Reoutput <- rbind(ReNov,ReDec,ReJan,ReFeb,ReMar,
+                  ReApr,ReMay,ReJun,ReJul,ReAug,ReSep,ReOct)
 ```
 
 ```{r}
+#Read route data
 routes <- read.csv("~/Desktop/routes.txt",header = TRUE)
+#Join Reliability data with route
 ReJoin <- left_join(Reoutput, routes, 
               by = c("gtfs_route_id" = "route_id"))
 Re <-  select(ReJoin, c(1,3,6,7,8,11,12,13,20,22,23))
 ```
 
 ```{r}
-order = c("21Nov", "21Dec","22Jan","22Feb","22Mar","22Apr","22May","22Jun","22Jul","22Aug","22Sep","22Oct") 
+#Order data by month
+order = c("21Nov", "21Dec","22Jan","22Feb","22Mar","22Apr","22May","22Jun",
+          "22Jul","22Aug","22Sep","22Oct") 
+#Calculate Reliability in group
 ReSum <- Re %>% group_by(mode_type,month) %>% 
   summarise(across(c(otp_numerator,otp_denominator,cancelled_numerator), sum))  %>%
   mutate(reliability = otp_numerator/otp_denominator) %>%
   mutate(month = factor(month, levels = order)) 
 ```
 
+\newpage
+## EDA
+
+### Bus & Commuter Rail & Rapid Transit
+
 ```{r}
+
 ggplot(ReSum, aes(x = month, y = reliability, fill = mode_type)) +
          geom_bar(position = position_dodge(0.75),width=0.6,stat = "identity")+
   coord_cartesian(ylim=c(0,1)) +
@@ -83,19 +114,28 @@ ggplot(ReSum, aes(x = month, y = reliability, fill = mode_type)) +
   facet_wrap(~ mode_type)
 ```
 
+The plot shows that the reliability of Bus is the lowest, and the reliability of commuter tail is higher than rapid transit. There is no obvious difference according to month distribution.
+\newpage
+
 ```{r}
 ggplot(ReSum, aes(x = month, y = cancelled_numerator, fill = mode_type)) +
          geom_bar(position = position_dodge(0.75),width=0.6,stat = "identity")+ 
-  coord_cartesian(ylim=c(0,11)) +
+  coord_cartesian(ylim=c(0,55)) +
   scale_y_continuous(expand = c(0,0)) +
   scale_fill_brewer(palette = "Dark2")+
   theme(axis.text.x = element_text(angle=90,size=8))+
   labs(title = "Cancellation rate by mode type") 
 ```
 
+The plot shows that the cancelled number of Commuter Rail system the highest and almost appears every month, so I think this system is not suitable. The highest number is in December 2021.
+\newpage
+
+### Rapid Transit
+
 ```{r}
 Re_rail <- Re %>% filter(mode_type=="Rail")
-ReSum_rail <- Re_rail %>% group_by(route_category,month) %>% dplyr::summarise(across(c(otp_numerator,otp_denominator,cancelled_numerator), sum))  %>%
+ReSum_rail <- Re_rail %>% group_by(route_category,month) %>% 
+  summarise(across(c(otp_numerator,otp_denominator,cancelled_numerator), sum))  %>%
   mutate(reliability = otp_numerator/otp_denominator) %>%
   mutate(month = factor(month, levels = order)) 
 ggplot(ReSum_rail, aes(x = month, y = reliability, fill = route_category)) +
@@ -110,9 +150,15 @@ ggplot(ReSum_rail, aes(x = month, y = reliability, fill = route_category)) +
   facet_wrap(~ route_category)
 ```
 
+The plot shows that the reliability of Blue Line is the highest, and Green Line is the lowest. Obviously Orange Line is missing data in August, so I assume it is out of service at this time.
+\newpage
+
+### Green Line
+
 ```{r}
 Re_railG <- Re %>% filter(route_category=="Green Line")
-ReSum_railG <- Re_railG %>% group_by(gtfs_route_id,month) %>% dplyr::summarise(across(c(otp_numerator,otp_denominator,cancelled_numerator), sum))  %>%
+ReSum_railG <- Re_railG %>% group_by(gtfs_route_id,month) %>% 
+  summarise(across(c(otp_numerator,otp_denominator,cancelled_numerator), sum))  %>%
   mutate(reliability = otp_numerator/otp_denominator) %>%
   mutate(month = factor(month, levels = order)) 
 ggplot(ReSum_railG, aes(x = month, y = reliability, fill = gtfs_route_id)) +
@@ -127,35 +173,52 @@ ggplot(ReSum_railG, aes(x = month, y = reliability, fill = gtfs_route_id)) +
   facet_wrap(~gtfs_route_id)
 ```
 
+The plot shows that Green-B system is more stable, because the data is evenly distributed from month to month.
+\newpage
+
+### Commuter Rail
+
 ```{r}
 Re_commuter <- Re %>% filter(mode_type=="Commuter Rail")
-ReSum_commuter <- Re_commuter %>% group_by(route_long_name,month) %>% dplyr::summarise(across(c(otp_numerator,otp_denominator,cancelled_numerator), sum))  %>%
+ReSum_commuter <- Re_commuter %>% group_by(route_long_name,month) %>% 
+  summarise(across(c(otp_numerator,otp_denominator,cancelled_numerator), sum))  %>%
   mutate(reliability = otp_numerator/otp_denominator) %>%
   mutate(month = factor(month, levels = order)) 
 ggplot(ReSum_commuter, aes(x = month, y = reliability, group = route_long_name))+
   geom_line(aes(color=route_long_name),linetype=1,size=0.5)+ 
   geom_point(aes(color=route_long_name),shape=8,size=2)+
-  theme(axis.text.x = element_text(angle=90,size=6),strip.text.x = element_text(size = 7))+
+  theme(axis.text.x = element_text(angle=90,size=6),
+        strip.text.x = element_text(size = 7))+
   guides(color = "none") + 
   labs(title = "Reliability by route name",
   subtitle = "(Cummter Rail)") +
   facet_wrap(~ route_long_name)
 ```
 
+The plot shows the reliability of each type of Commuter Rail has different trends and fluctuations from month to month, with most plummeting in January and February.
+
 ```{r}
-ggplot(ReSum_commuter, aes(x = month, y = cancelled_numerator, group = route_long_name))+
+ggplot(ReSum_commuter, aes(x = month, y = cancelled_numerator, 
+                           group = route_long_name))+
   geom_line(aes(color=route_long_name),linetype=1,size=0.5)+ 
   geom_point(aes(color=route_long_name),shape=10,size=2)+
-  theme(axis.text.x = element_text(angle=90,size=6),strip.text.x = element_text(size = 7))+
+  theme(axis.text.x = element_text(angle=90,size=6),
+        strip.text.x = element_text(size = 7))+
   guides(color = "none") + 
   labs(title = "Cancellation rate by route name",
   subtitle = "(Commuter Rail)") +
   facet_wrap(~ route_long_name)
 ```
 
+The plot shows the distribution cancelled number of each Commuter Rail are increasing sharply in January and February. I consider it is because of the cold weather, which prevents the normal operation.
+\newpage
+
+### Bus
+
 ```{r}
 Re_bus <- Re %>% filter(mode_type=="Bus")
-ReSum_bus <- Re_bus %>% group_by(gtfs_route_desc,month) %>% dplyr::summarise(across(c(otp_numerator,otp_denominator,cancelled_numerator), sum))  %>%
+ReSum_bus <- Re_bus %>% group_by(gtfs_route_desc,month) %>% 
+  summarise(across(c(otp_numerator,otp_denominator,cancelled_numerator), sum))  %>%
   mutate(reliability = otp_numerator/otp_denominator) %>%
   mutate(month = factor(month, levels = order)) 
 ggplot(ReSum_bus, aes(x = month, y = reliability, fill = gtfs_route_desc)) +
@@ -163,12 +226,18 @@ ggplot(ReSum_bus, aes(x = month, y = reliability, fill = gtfs_route_desc)) +
   coord_cartesian(ylim=c(0,1)) +
   scale_y_continuous(expand = c(0,0)) +
   scale_fill_brewer(palette="Set2")+
-  theme(axis.text.x = element_text(angle=90,size=8))+
+  theme(axis.text.x = element_text(angle=90,size=8),
+        strip.text.x = element_text(size = 7))+
   guides(fill = "none") +
   facet_wrap(~ gtfs_route_desc)
+```
+
+The plot shows the reliability of Rail Replacement Bus is the highest, and Express Bus and Limited Service is the lowest.
+
+```{r}
 ggplot(ReSum_bus, aes(x = month, y = cancelled_numerator, fill = gtfs_route_desc)) +
          geom_bar(position = position_dodge(0.75), width=3, stat = "identity")+ 
-  coord_cartesian(ylim=c(0,2.5)) +
+  coord_cartesian(ylim=c(0,12.5)) +
   scale_y_continuous(expand = c(0,0)) +
   scale_fill_brewer(palette = "Dark2")+
   labs(title = "Reliability by route description",
@@ -176,5 +245,4 @@ ggplot(ReSum_bus, aes(x = month, y = cancelled_numerator, fill = gtfs_route_desc
   theme(axis.text.x = element_text(angle=90,size=8))
 ```
 
-
-
+The plot shows that the cancelled number of Rail Replacement Bus appears in four months, January 2022 is the highest.
