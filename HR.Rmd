@@ -1,0 +1,83 @@
+---
+title: "HR travel"
+author: "Lintong Li"
+date: "2022-12-16"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readr)
+library(tidyverse)
+HRQ1_22 <- read_csv("~/Desktop/2022-Q1_HRTravelTimes.csv",show_col_types = FALSE)
+HRQ2_22 <- read_csv("~/Desktop/2022-Q2_HRTravelTimes.csv",show_col_types = FALSE)
+HRQ3_22 <- read_csv("~/Desktop/2022-Q3_HRTravelTimes.csv",show_col_types = FALSE)
+HRQ4_21 <- read_csv("~/Desktop/HRTravelTimesQ4_21.csv",show_col_types = FALSE)
+```
+
+```{r}
+HROct <- HRQ4_21 %>% filter(service_date == "2021-10-25"| service_date == "2021-10-26"|service_date == "2021-10-27"| service_date == "2021-10-28"| service_date == "2021-10-29"| service_date == "2021-10-30"| service_date == "2021-10-31")
+HRNov <- HRQ4_21 %>% filter(service_date == "2021-11-22"| service_date == "2021-11-23"|service_date == "2021-11-24"| service_date == "2021-11-25"| service_date == "2021-11-26"| service_date == "2021-11-27"| service_date == "2021-11-28")
+HRDec <- HRQ4_21 %>% filter(service_date == "2021-12-20"| service_date == "2021-12-21"|service_date == "2021-12-22"| service_date == "2021-12-23"| service_date == "2021-12-24"| service_date == "2021-12-25"| service_date == "2021-12-26")
+HRJan <- HRQ1_22 %>% filter(service_date == "2022-01-24"| service_date == "2022-01-25"|service_date == "2022-01-26"|service_date == "2022-01-27"| service_date == "2022-01-28"| service_date == "2022-01-29"| service_date == "2022-01-30")
+HRFeb <- HRQ1_22 %>% filter(service_date == "2022-02-21"|service_date == "2022-02-22"| service_date == "2022-02-23"| service_date == "2022-02-24"| service_date == "2022-02-25"| service_date == "2022-02-26"|service_date == "2022-02-27")
+HRMar <- HRQ1_22 %>% filter(service_date == "2022-03-21"|service_date == "2022-03-22"| service_date == "2022-03-23"| service_date == "2022-03-24"| service_date == "2022-03-25"| service_date == "2022-03-26"|service_date == "2022-03-27")
+HRApr <- HRQ2_22 %>% filter(service_date == "2022-04-18"|service_date == "2022-04-19"| service_date == "2022-04-20"| service_date == "2022-04-21"| service_date == "2022-04-22"| service_date == "2022-04-23"|service_date == "2022-04-24")
+HRMay <- HRQ2_22 %>% filter(service_date == "2022-05-23"|service_date == "2022-05-24"| service_date == "2022-05-25"| service_date == "2022-05-26"| service_date == "2022-05-27"| service_date == "2022-05-28"|service_date == "2022-05-29")
+HRJun <- HRQ2_22 %>% filter(service_date == "2022-06-20"|service_date == "2022-06-21"| service_date == "2022-06-22"| service_date == "2022-06-23"| service_date == "2022-06-24"| service_date == "2022-06-25"|service_date == "2022-06-26")
+HRJul <- HRQ3_22 %>% filter(service_date == "2022-07-25"|service_date == "2022-07-26"| service_date == "2022-07-27"| service_date == "2022-07-28"| service_date == "2022-07-29"| service_date == "2022-07-30"|service_date == "2022-07-31")
+HRAug <- HRQ3_22 %>% filter(service_date == "2022-08-22"|service_date == "2022-08-23"| service_date == "2022-08-24"| service_date == "2022-08-25"| service_date == "2022-08-26"| service_date == "2022-08-27"|service_date == "2022-08-28")
+HRSep <- HRQ3_22 %>% filter(service_date == "2022-09-19"|service_date == "2022-09-20"| service_date == "2022-09-21"| service_date == "2022-09-22"| service_date == "2022-09-23"| service_date == "2022-09-24"|service_date == "2022-09-25")
+```
+```{r}
+HRJan$month <- "Jan"
+HRFeb$month <- "Feb"
+HRMar$month <- "Mar"
+HRApr$month <- "Apr"
+HRMay$month <- "May"
+HRJun$month <- "Jun"
+HRJul$month <- "Jul"
+HRAug$month <- "Aug"
+HRSep$month <- "Sep"
+HROct$month <- "Oct"
+HRNov$month <- "Nov"
+HRDec$month <- "Dec"
+```
+
+```{r}
+HR <- rbind(HRJan,HRFeb,HRMar,HRApr,HRMay,HRJun,HRJul,HRAug,HRSep,HROct,HRNov,HRDec)
+HR$day_name <- weekdays(HR$service_date)
+HR$season <- case_when(
+  between(HR$service_date, as.Date("2021-11-30"), as.Date("2022-03-01")) ~ "Winter",
+  between(HR$service_date, as.Date("2022-02-28"), as.Date("2022-06-01")) ~ "Spring",
+  between(HR$service_date, as.Date("2022-05-31"), as.Date("2022-09-01")) ~ "Summer",
+  TRUE ~ "Fall"
+)
+```
+
+```{r}
+stops <- read.csv("~/Desktop/stops.txt",header = TRUE)
+stop1 <- left_join(HR, stops, by = c("from_stop_id"="stop_code"))
+stop2 <- left_join(stop1, stops, by = c("to_stop_id"="stop_code"))
+```
+```{r}
+HR <- select(stop2,c("route_id" ,"travel_time_sec","month","day_name","season","stop_id.x", "stop_name.x","stop_desc.x","stop_lat.x","stop_lon.x","stop_id.y","stop_name.y","stop_desc.y", "stop_lat.y","stop_lon.y"))
+```
+```{r}
+#HR <- read_csv("~/Desktop/HR.csv")
+```
+
+```{r}
+HRshiny <- HR %>%
+  group_by(day_name,season,route_id,stop_name.x,stop_name.y,stop_lat.x,stop_lon.x,stop_lat.y,stop_lon.y) %>%
+  summarise_at(vars(travel_time_sec), list(avg_time = mean))
+```
+```{r}
+write_csv(HRshiny,"~/Desktop/HRshiny.csv")
+```
+
+
+
