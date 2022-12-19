@@ -13,7 +13,7 @@ library(dbplyr)
 
 LR <- read.csv("https://raw.githubusercontent.com/Nancycia/MA615-FinalProject/main/LRshiny.csv")
 LR <- LR[,-1]
-LR$traveltime_mins <- LR$avg_time/60
+LR$traveltime_mins <- round(LR$avg_time/60)
 LR <- LR %>% 
   rename("from_stop_name" = "stop_name.x",
          "to_stop_name" = "stop_name.y",
@@ -22,7 +22,7 @@ LR <- LR %>%
          "stop1_lon" = "stop_lon.x",
          "stop2_lon" = "stop_lon.y")
 HR <- read.csv("https://raw.githubusercontent.com/Nancycia/MA615-FinalProject/main/HRshiny.csv")
-HR$traveltime_mins <- HR$avg_time/60
+HR$traveltime_mins <- round(HR$avg_time/60)
 HR <- HR %>% 
   rename("from_stop_name" = "stop_name.x",
          "to_stop_name" = "stop_name.y",
