@@ -13,7 +13,7 @@ library(dbplyr)
 
 LR <- read.csv("https://raw.githubusercontent.com/Nancycia/MA615-FinalProject/main/LRshiny.csv")
 LR <- LR[,-1]
-LR$traveltime_mins <- round(LR$avg_time/60)
+
 LR <- LR %>% 
   rename("from_stop_name" = "stop_name.x",
          "to_stop_name" = "stop_name.y",
@@ -22,7 +22,7 @@ LR <- LR %>%
          "stop1_lon" = "stop_lon.x",
          "stop2_lon" = "stop_lon.y")
 HR <- read.csv("https://raw.githubusercontent.com/Nancycia/MA615-FinalProject/main/HRshiny.csv")
-HR$traveltime_mins <- round(HR$avg_time/60)
+
 HR <- HR %>% 
   rename("from_stop_name" = "stop_name.x",
          "to_stop_name" = "stop_name.y",
@@ -34,8 +34,9 @@ data <- rbind(LR,HR)
 
 shinydata <- data %>%
   group_by(day_name,season,route_id,from_stop_name,to_stop_name) %>%
-  summarise_at(vars("stop1_lat","stop1_lon","stop2_lat","stop2_lon","traveltime_mins"), mean)
+  summarise_at(vars("stop1_lat","stop1_lon","stop2_lat","stop2_lon","avg_time"), mean)
 
+shinydata$traveltime_mins <- round(shinydata$avg_time/60) 
 
 LRfrom_stopdata <- LR %>% dplyr::select(route_id,from_stop_name, stop1_lat,stop1_lon)
 LRto_stopdata <- LR %>% dplyr::select(route_id,to_stop_name, stop2_lat,stop2_lon)
