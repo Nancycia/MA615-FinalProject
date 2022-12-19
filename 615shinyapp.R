@@ -117,7 +117,7 @@ server <- function(input, output) {
       addMarkers(lng = shiny()$stop2_lon, 
                  lat = shiny()$stop2_lat,
                  popup = shiny()$to_stop_name)})
-  output$datatable <- renderDataTable(filter(shinydata,season == input$season, day_name == input$weekday, from_stop_name == input$stop1, to_stop_name == input$stop2),options = list(pageLength = 5))
+  output$datatable <- renderDataTable(filter(shinydata,season%in%input$season, day_name%in%input$weekday, from_stop_name%in%input$stop1, to_stop_name%in%input$stop2),options = list(pageLength = 5))
   output$text <- renderText({ 
     paste("The travel from ",input$stop1, "to",input$stop2, "in", input$season,"on",input$weekday)})
 }
